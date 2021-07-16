@@ -1,0 +1,28 @@
+- name: unarchive node_exporter
+  unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: copy node_exporter file remotely
+  copy:
+    src: /usr/local/bin/node_exporter-1.0.1.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    remote_src: yes
+    mode: 0755
+
+- name: delete downloaded file
+  file:
+    path: /usr/local/bin/node_exporter-1.0.1.linux-amd64
+    state: absent
+
+- name: copy file for system deamon(exporter)
+  copy:
+    src: node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+
+- name: start node_exporter by systemd
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
